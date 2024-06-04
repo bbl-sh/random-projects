@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            font-size: 20px;
+            margin: 10px;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rock Paper Scissors</h1>
+    <div id="game">
+        <button onclick="makeChoice('rock')">Rock</button>
+        <button onclick="makeChoice('paper')">Paper</button>
+        <button onclick="makeChoice('scissors')">Scissors</button>
+    </div>
+    <div id="result"></div>
+    <script>
+        const socket = io();
+
+        socket.on('welcome', (data) => {
+            console.log('Welcome:', data);
+        });
+
+        socket.on('newPlayer', (data) => {
+            console.log('New Player:', data);
+        });
+
+        socket.on('result', (result) => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = result.message;
+        });
+
+        socket.on('playerLeft', (data) => {
+            console.log('Player Left:', data);
+        });
+
+        function makeChoice(choice) {
+            socket.emit('makeChoice', choice);
+        }
+    </script>
+</body>
+</html>

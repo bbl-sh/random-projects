@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rock Paper Scissors</title>
+  <style>
+    /* Add your styling here */
+  </style>
+</head>
+<body>
+  <h1>Rock Paper Scissors</h1>
+
+  <div id="game">
+    <p>Enter your name:</p>
+    <input type="text" id="playerName">
+    <button id="joinGame">Join Game</button>
+
+    <div id="waiting">Waiting for another player...</div>
+
+    <div id="gameArea" style="display: none;">
+      <p>Choose your weapon:</p>
+      <button id="rock">Rock</button>
+      <button id="paper">Paper</button>
+      <button id="scissors">Scissors</button>
+
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const playerNameInput = document.getElementById('playerName');
+    const joinGameBtn = document.getElementById('joinGame');
+    const waitingArea = document.getElementById('waiting');
+    const gameArea = document.getElementById('gameArea');
+    const rockBtn = document.getElementById('rock');
+    const paperBtn = document.getElementById('paper');
+    const scissorsBtn = document.getElementById('scissors');
+    const resultDiv = document.getElementById('result');
+
+    joinGameBtn.addEventListener('click', () => {
+      const playerName = playerNameInput.value.trim();
+      if (playerName) {
+        socket.emit('join', playerName);
+        waitingArea.style.display = 'block';
+        joinGameBtn.disabled = true;
+        playerNameInput.disabled = true;
+      }
+    });
+
+    socket.on('gameStart', (data) => {
+      waitingArea.style.display = 'none';
+      gameArea.style.display = 'block';
+    });
+
+    // Handle choice buttons
+    rockBtn.addEventListener('click', () => { socket.emit('choice', 'rock'); });
+    paperBtn.addEventListener('click', () => { socket.emit('choice', 'paper'); });
+    scissorsBtn.addEventListener('click', () => { socket.emit('choice', 'scissors'); });
+
+    // Display the result
+    socket.on('result', (data) => {
+      resultDiv.innerHTML = `
+        <p>${data.player1.name} chose ${data.player1.choice}</p>
+        <p>${data.player2.name} chose ${data.player2.choice}</p>
+        <h2>${data.result}</h2>
+      `;
+    });
+
+    // Handle opponent disconnect
+    socket.on('opponentDisconnected', () => {
+      resultDiv.innerHTML = '<p>Opponent disconnected!</p>';
+      // You can reset the game or handle it as needed
+    });
+  </script>
+</body>
+</html>
