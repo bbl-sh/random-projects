@@ -1,0 +1,6 @@
+puppeteer
+puppeteer-extra
+puppeteer-extra-plugin-stealth 
+puppeteer-extra-plugin-adblocker
+--save-dev typescript @types/node
+--save-dev ts-node
